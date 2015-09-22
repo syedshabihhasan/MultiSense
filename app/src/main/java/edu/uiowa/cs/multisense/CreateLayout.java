@@ -7,12 +7,16 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.sql.Array;
+import java.util.Arrays;
+
 
 /**
  *
  */
 public class CreateLayout {
     private Context context;
+    private boolean[] pressedResponse;
 
     protected CreateLayout(Context context){
         this.context = context;
@@ -23,12 +27,11 @@ public class CreateLayout {
      * Creates a linear layout based on the string input
      * @param qAString : a string array, first string is the question text, the remaining are the
      *                 answer texts
-     * @param qNo : integer representing the question number
      * @return LinearLayout with the appropriate questions and answers
      * */
-    protected LinearLayout createLayoutOnInput(String[] qAString, int qNo){
+    protected LinearLayout createLayoutOnInput(String[] qAString){
         LinearLayout linearLayout = new LinearLayout(this.context);
-
+        pressedResponse = new boolean[qAString.length - 1];
         LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
@@ -80,6 +83,8 @@ public class CreateLayout {
         buttonToUse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Arrays.fill(pressedResponse, false);
+                pressedResponse[idx] = true;
                 buttonToUse.setBackgroundColor(Color.LTGRAY);
                 for(int i=0; i<allButtons.length; i++){
                     if(idx != i){
@@ -89,5 +94,15 @@ public class CreateLayout {
             }
         });
         return buttonToUse;
+    }
+
+    public int getFinalResponse(){
+        int toReturn = -1;
+        for(int i=0;i < pressedResponse.length; i++){
+            if(pressedResponse[i]){
+                return i;
+            }
+        }
+        return toReturn;
     }
 }
