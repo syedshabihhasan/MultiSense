@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 
 import edu.uiowa.cs.multisense.R;
@@ -27,23 +28,26 @@ public class ReadFromFile {
      * This method extracts the questions in the survey and returns them as an arraylist of string[]
      * */
     public ArrayList<String[]> getQuestions(){
-
-        InputStream is = this.context.getResources().openRawResource(R.raw.surveyquestions);
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        ArrayList<String> allInput = new ArrayList<>();
-        String line;
-
-        try {
-            while (null != (line = br.readLine())) {
-                allInput.add(line);
-            }
-        }catch(IOException e){
-            Log.e("getQuestions", "IO Exception: " + e.toString());
-        }
-        ArrayList<String[]> qDB = seperateOutValues(allInput);
-        return qDB;
+        return seperateOutValues(readInternalFile(R.raw.surveyquestions));
     }
 
+    public HashMap<Integer, int[]> getLogicMap(){
+        HashMap<Integer, int[]> logicMap = new HashMap<>();
+        ArrayList<String[]> logicDB = seperateOutValues(readInternalFile(R.raw.surveylogic));
+        int qNo;
+        int[] tempCondition;
+        String[] tempStr;
+        for(int i=0; i<logicDB.size(); i++){
+            tempStr = logicDB.get(i);
+            qNo = Integer.parseInt(tempStr[0]);
+            tempCondition = new int[tempStr.length - 1];
+            for(int j=1; j< tempStr.length; j++){
+                tempCondition[j-1] = Integer.parseInt(tempStr[j]);
+            }
+            logicMap.put(qNo, tempCondition);
+        }
+        return logicMap;
+    }
     /**
      * Read from the input arraylist and extract the questions, and options in an ArrayList of
      * String[]
@@ -55,5 +59,21 @@ public class ReadFromFile {
             qDB.add(temp.split(Pattern.quote("//")));
         }
         return qDB;
+    }
+
+    private ArrayList<String> readInternalFile(int fileID){
+        InputStream is = this.context.getResources().openRawResource(fileID);
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        ArrayList<String> allInput = new ArrayList<>();
+        String line;
+
+        try {
+            while (null != (line = br.readLine())) {
+                allInput.add(line);
+            }
+        }catch(IOException e){
+            Log.e("readInternalFile", "IO Exception: " + e.toString());
+        }
+        return allInput;
     }
 }

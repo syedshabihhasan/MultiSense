@@ -11,9 +11,9 @@ import java.util.HashMap;
 public class MoveQuestion {
     //TODO link this class with MultiSense
 
-    private HashMap<Integer, Integer[]> logicMap;
+    private HashMap<Integer, int[]> logicMap;
 
-    public MoveQuestion(HashMap<Integer, Integer[]> logicMap){
+    public MoveQuestion(HashMap<Integer, int[]> logicMap){
         this.logicMap = logicMap;
     }
 
@@ -40,7 +40,7 @@ public class MoveQuestion {
         }
         else{
             Log.d("NQ:gNQ", "Conditions exist for qNo:"+qNo+", checking");
-            Integer[] conditions = logicMap.get(qNo);
+            int[] conditions = logicMap.get(qNo);
             boolean conditionsMet = true;
             for(int i=0; i< conditions.length; i+=3){
                 int qToCheck = conditions[i];
@@ -54,7 +54,7 @@ public class MoveQuestion {
                 else{
                     int actualResponse = responses.getResponse(qToCheck);
 
-                    if(lowerLim < actualResponse && actualResponse < upperLim){
+                    if(lowerLim <= actualResponse && actualResponse <= upperLim){
                         conditionsMet &= true;
                     }
                     else{

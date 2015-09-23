@@ -7,6 +7,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.sql.Array;
 import java.util.Arrays;
 
@@ -15,7 +17,7 @@ import java.util.Arrays;
  *
  */
 public class CreateLayout {
-    private Context context;
+    private static Context context;
     private boolean[] pressedResponse;
 
     protected CreateLayout(Context context){
@@ -30,7 +32,7 @@ public class CreateLayout {
      * @return LinearLayout with the appropriate questions and answers
      * */
     protected LinearLayout createLayoutOnInput(String[] qAString){
-        LinearLayout linearLayout = new LinearLayout(this.context);
+        LinearLayout linearLayout = new LinearLayout(context);
         pressedResponse = new boolean[qAString.length - 1];
         LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
@@ -40,17 +42,29 @@ public class CreateLayout {
         final int n = qAString.length;
 
         // set the question text
-        TextView questionText = createTextView(qAString[0], (float) 32, Color.BLACK, this.context);
+        TextView questionText = createTextView(qAString[0], (float) 24, Color.BLACK, context);
         linearLayout.addView(questionText);
 
         // create the option button and set the logic
         Button[] optionButton = new Button[n-1];
         for(int i=0; i<n-1; i++){
-            optionButton[i] = createButton(qAString[i + 1], 32, this.context);
+            optionButton[i] = createButton(qAString[i + 1], 24, context);
             optionButton[i] = setButtonLogic(optionButton[i], optionButton, i);
             linearLayout.addView(optionButton[i]);
         }
 
+        return linearLayout;
+    }
+
+    protected LinearLayout createFinalLayout(){
+        LinearLayout linearLayout = new LinearLayout(context);
+        LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.setLayoutParams(linearLayoutParams);
+        TextView textView = createTextView("Survey finished, press Finish to end", (float) 24,
+                Color.GREEN, context);
+        linearLayout.addView(textView);
         return linearLayout;
     }
 
@@ -69,10 +83,10 @@ public class CreateLayout {
 
         button.setText(toSet);
         button.setTextSize(fontSize);
-        button.setBackgroundColor(Color.DKGRAY);
+        button.setBackgroundColor(Color.rgb(102, 178, 255));
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(2, 5, 2, 5);
+        params.setMargins(10, 5, 10, 5);
         button.setLayoutParams(params);
 
         return button;
@@ -85,10 +99,10 @@ public class CreateLayout {
             public void onClick(View v) {
                 Arrays.fill(pressedResponse, false);
                 pressedResponse[idx] = true;
-                buttonToUse.setBackgroundColor(Color.LTGRAY);
-                for(int i=0; i<allButtons.length; i++){
-                    if(idx != i){
-                        allButtons[i].setBackgroundColor(Color.DKGRAY);
+                buttonToUse.setBackgroundColor(Color.rgb(0, 128, 255));
+                for (int i = 0; i < allButtons.length; i++) {
+                    if (idx != i) {
+                        allButtons[i].setBackgroundColor(Color.rgb(102, 178, 255));
                     }
                 }
             }
