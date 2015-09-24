@@ -6,18 +6,21 @@ import android.media.AudioRecord;
 import android.os.IBinder;
 import android.util.Log;
 
-import java.util.ArrayList;
+import java.util.Calendar;
 
 import edu.uiowa.cs.multisense.MultiSenseConstants;
-import edu.uiowa.cs.multisense.fileio.DataStore;
+import edu.uiowa.cs.multisense.fileio.WriteAudioFile;
 
+/**
+ * @author syed shabih hasan
+ * This is a service class that records audio and stores it to disk.
+ * */
 public class RecordAudioEMA extends Service {
 
     private boolean isRecording = false;
     private AudioRecord audioRecord;
     private Thread extractFromBuffer;
-    private long timeStamp;
-    private ArrayList<short[]> recordedAudio;
+    private WriteAudioFile writeAudioFile;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -30,8 +33,8 @@ public class RecordAudioEMA extends Service {
         if(!isRecording){
             Log.d("MS:RecordService", "Not recording, going to record");
             initVals();
-            audioRecord.startRecording();
             isRecording = true;
+            audioRecord.startRecording();
             extractFromBuffer.start();
         }
         Log.d("MS:RecordService", "Exiting onStartCommand()");
@@ -46,47 +49,62 @@ public class RecordAudioEMA extends Service {
         audioRecord.release();
         audioRecord = null;
         extractFromBuffer = null;
-        Log.d("MS:RecordService", "Total recorded shorts:"+recordedAudio.size());
-        DataStore audioData = new DataStore(timeStamp, recordedAudio);
-        audioData.writeToFile();
+        writeAudioFile.doneWriting();
         Log.d("MS:RecordService", "Exiting onDestroy()");
     }
 
+    /**
+     * Initializes the values of the all the variables needed, also defines the variable
+     * */
     private void initVals(){
         Log.d("MS:RecordService", "Entering initVals()");
-        timeStamp = System.currentTimeMillis();
+        Calendar calendar = Calendar.getInstance();
+
+        String currentDateTime = ""+
+                calendar.get(Calendar.YEAR)+"_"+
+                calendar.get(Calendar.MONTH)+1+"_"+
+                calendar.get(Calendar.DAY_OF_MONTH)+"_"+
+                calendar.get(Calendar.HOUR_OF_DAY)+"_"+
+                calendar.get(Calendar.MINUTE)+"_"+
+                calendar.get(Calendar.SECOND)+"_"+
+                calendar.get(Calendar.MILLISECOND);
+
+        writeAudioFile = new WriteAudioFile(currentDateTime);
+
         audioRecord = new AudioRecord(MultiSenseConstants.RECORDER_SOURCE,
                 MultiSenseConstants.SAMPLING_RATE,
                 MultiSenseConstants.RECORDER_CHANNEL,
                 MultiSenseConstants.RECORDER_ENCODING,
                 MultiSenseConstants.BUFFER_SIZE_BYTES);
-        recordedAudio = new ArrayList<>();
+
+        // the thread that extracts the recorded audio
         extractFromBuffer = new Thread(new Runnable() {
             @Override
             public void run() {
                 extractShortsFromBuffer();
             }
         }, "AudioRecordingThread");
+
         Log.d("MS:RecordService", "Exiting initVals()");
     }
 
-    private ArrayList<short[]> extractShortsFromBuffer() {
+    /**
+     * extract the recorded audio from the AudioRecorder object and ship it to be written to disk
+     * */
+    private void extractShortsFromBuffer() {
         Log.d("MS:RecordService", "Entered extractShortsFromBuffer");
         short[] audioData = new short[MultiSenseConstants.BUFFER_SIZE_BYTES/2];
         int status;
         while (isRecording){
-            status = audioRecord.read(audioData, 0, MultiSenseConstants.BUFFER_SIZE_BYTES/2);
-            if(-1 < status){
-                recordedAudio.add(audioData);
-            }
+            audioRecord.read(audioData, 0, MultiSenseConstants.BUFFER_SIZE_BYTES / 2);
+            writeAudioFile.writeToFile(audioData);
         }
         // in case some data is left in the buffer
         status = audioRecord.read(audioData, 0, MultiSenseConstants.BUFFER_SIZE_BYTES/2);
         if(-1 < status){
-            recordedAudio.add(audioData);
+            writeAudioFile.writeToFile(audioData);
         }
         Log.d("MS:RecordService", "Exiting extractShortsFromBuffer");
-        return recordedAudio;
     }
 
 }
