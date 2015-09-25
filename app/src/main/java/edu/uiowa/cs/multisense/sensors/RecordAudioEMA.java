@@ -73,7 +73,7 @@ public class RecordAudioEMA extends Service {
 
         String currentDateTime = ""+
                 calendar.get(Calendar.YEAR)+"_"+
-                calendar.get(Calendar.MONTH)+1+"_"+
+                (calendar.get(Calendar.MONTH)+1)+"_"+
                 calendar.get(Calendar.DAY_OF_MONTH)+"_"+
                 calendar.get(Calendar.HOUR_OF_DAY)+"_"+
                 calendar.get(Calendar.MINUTE)+"_"+
