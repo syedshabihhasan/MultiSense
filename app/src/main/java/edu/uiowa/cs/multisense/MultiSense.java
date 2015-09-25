@@ -18,6 +18,7 @@ import edu.uiowa.cs.multisense.ema.MoveQuestion;
 import edu.uiowa.cs.multisense.ema.ResponseStore;
 import edu.uiowa.cs.multisense.fileio.ReadFromFile;
 import edu.uiowa.cs.multisense.sensors.RecordAudioEMA;
+import edu.uiowa.cs.multisense.ui.CreateLayout;
 
 public class MultiSense extends AppCompatActivity {
 
@@ -107,8 +108,6 @@ public class MultiSense extends AppCompatActivity {
         finishButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopService(intent);
-                Toast.makeText(context, "Stopping service", Toast.LENGTH_LONG).show();
                 finish();
             }
         });

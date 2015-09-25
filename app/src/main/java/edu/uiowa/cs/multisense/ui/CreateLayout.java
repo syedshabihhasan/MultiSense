@@ -1,4 +1,4 @@
-package edu.uiowa.cs.multisense;
+package edu.uiowa.cs.multisense.ui;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -7,9 +7,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.sql.Array;
 import java.util.Arrays;
 
 
@@ -22,7 +19,6 @@ public class CreateLayout {
 
     protected CreateLayout(Context context){
         this.context = context;
-        //TODO: create recording class and initalize
     }
 
     /**

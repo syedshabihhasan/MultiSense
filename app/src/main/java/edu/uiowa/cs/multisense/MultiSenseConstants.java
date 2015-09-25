@@ -17,4 +17,6 @@ public class MultiSenseConstants {
     public final static int SURVEY_TYPE = 2;
 
     public final static String FILE_LOCATION = "/sdcard/MultiSense/";
+
+    public static final int TIMER_COUNT = 1*60*1000;
 }

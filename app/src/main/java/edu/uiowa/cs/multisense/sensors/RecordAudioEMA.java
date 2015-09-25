@@ -7,6 +7,8 @@ import android.os.IBinder;
 import android.util.Log;
 
 import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import edu.uiowa.cs.multisense.MultiSenseConstants;
 import edu.uiowa.cs.multisense.fileio.WriteAudioFile;
@@ -17,10 +19,12 @@ import edu.uiowa.cs.multisense.fileio.WriteAudioFile;
  * */
 public class RecordAudioEMA extends Service {
 
-    private boolean isRecording = false;
+    private static boolean isRecording = false;
     private AudioRecord audioRecord;
     private Thread extractFromBuffer;
     private WriteAudioFile writeAudioFile;
+    private static TimerTask stopServiceTimerTask;
+    private static Timer stopServiceTimer;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -36,6 +40,13 @@ public class RecordAudioEMA extends Service {
             isRecording = true;
             audioRecord.startRecording();
             extractFromBuffer.start();
+            stopServiceTimer.schedule(stopServiceTimerTask, MultiSenseConstants.TIMER_COUNT);
+        }else{
+            // if there is a user initiated survey, or if there is an intent,
+            // cancel the current timer and reset to record for another pre-decided duration
+            stopServiceTimer.cancel();
+            stopServiceTimer.purge();
+            stopServiceTimer.schedule(stopServiceTimerTask, MultiSenseConstants.TIMER_COUNT);
         }
         Log.d("MS:RecordService", "Exiting onStartCommand()");
         return START_NOT_STICKY;
@@ -84,6 +95,15 @@ public class RecordAudioEMA extends Service {
                 extractShortsFromBuffer();
             }
         }, "AudioRecordingThread");
+
+        stopServiceTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                onDestroy();
+            }
+        };
+
+        stopServiceTimer = new Timer();
 
         Log.d("MS:RecordService", "Exiting initVals()");
     }
