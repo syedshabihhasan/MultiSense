@@ -17,7 +17,7 @@ public class CreateLayout {
     private static Context context;
     private boolean[] pressedResponse;
 
-    protected CreateLayout(Context context){
+    public CreateLayout(Context context){
         this.context = context;
     }
 
@@ -27,7 +27,7 @@ public class CreateLayout {
      *                 answer texts
      * @return LinearLayout with the appropriate questions and answers
      * */
-    protected LinearLayout createLayoutOnInput(String[] qAString){
+    public LinearLayout createLayoutOnInput(String[] qAString){
         LinearLayout linearLayout = new LinearLayout(context);
         pressedResponse = new boolean[qAString.length - 1];
         LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
@@ -52,7 +52,7 @@ public class CreateLayout {
         return linearLayout;
     }
 
-    protected LinearLayout createFinalLayout(){
+    public LinearLayout createFinalLayout(){
         LinearLayout linearLayout = new LinearLayout(context);
         LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
