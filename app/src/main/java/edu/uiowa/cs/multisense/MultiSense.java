@@ -7,13 +7,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import edu.uiowa.cs.multisense.sensors.RecordAudioEMA;
-import edu.uiowa.cs.multisense.ui.CreateSettingsLayout;
+import edu.uiowa.cs.multisense.ui.CreateMainScreenLayout;
 
 public class MultiSense extends AppCompatActivity {
 
     private Context context;
     private Intent intent;
-    private CreateSettingsLayout createSettingsLayout;
+    private CreateMainScreenLayout createMainScreenLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,12 +22,12 @@ public class MultiSense extends AppCompatActivity {
         initVals();
         startService(intent);
         Toast.makeText(context, "Starting service", Toast.LENGTH_SHORT).show();
-        createSettingsLayout.constructSettingsScreen();
+        createMainScreenLayout.constructSettingsScreen();
     }
 
     private void initVals(){
         context = this;
-        createSettingsLayout = new CreateSettingsLayout(context);
+        createMainScreenLayout = new CreateMainScreenLayout(context);
         intent = new Intent(this, RecordAudioEMA.class);
     }
 

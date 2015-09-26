@@ -17,13 +17,13 @@ import edu.uiowa.cs.multisense.ema.MultiSenseAlarmManager;
 /**
  * Created by Syed Shabih Hasan on 9/25/15.
  */
-public class CreateSettingsLayout {
+public class CreateMainScreenLayout {
 
     private Context context;
     private Activity multiSenseActivity;
     private CreateSurveyLayout createSurveyLayout;
 
-    public CreateSettingsLayout(Context ipContext){
+    public CreateMainScreenLayout(Context ipContext){
         this.context = ipContext;
         this.multiSenseActivity = (Activity) this.context;
         this.createSurveyLayout = new CreateSurveyLayout(this.context);
