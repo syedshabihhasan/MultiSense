@@ -22,7 +22,7 @@ public class MultiSense extends AppCompatActivity {
         initVals();
         startService(intent);
         Toast.makeText(context, "Starting service", Toast.LENGTH_SHORT).show();
-        createMainScreenLayout.constructSettingsScreen();
+        createMainScreenLayout.constructMainScreen();
     }
 
     private void initVals(){

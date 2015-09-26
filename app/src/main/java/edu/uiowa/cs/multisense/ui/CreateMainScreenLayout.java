@@ -29,7 +29,7 @@ public class CreateMainScreenLayout {
         this.createSurveyLayout = new CreateSurveyLayout(this.context);
     }
 
-    public void constructSettingsScreen(){
+    public void constructMainScreen(){
         LinearLayout settingsLayout = new LinearLayout(this.context);
         LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
