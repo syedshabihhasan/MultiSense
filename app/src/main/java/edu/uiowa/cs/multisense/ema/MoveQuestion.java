@@ -9,7 +9,6 @@ import java.util.HashMap;
  * Created by hasanshabih on 9/18/15.
  */
 public class MoveQuestion {
-    //TODO link this class with MultiSense
 
     private HashMap<Integer, int[]> logicMap;
 

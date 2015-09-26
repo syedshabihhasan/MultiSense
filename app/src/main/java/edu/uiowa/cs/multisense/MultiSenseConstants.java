@@ -11,7 +11,7 @@ public class MultiSenseConstants {
     public final static int RECORDER_CHANNEL = AudioFormat.CHANNEL_IN_MONO;
     public final static int RECORDER_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     public final static int RECORDER_SOURCE = MediaRecorder.AudioSource.MIC;
-    public final static int BUFFER_SIZE_BYTES = 8192;
+    public final static int BUFFER_SIZE_BYTES = 4096;
 
     public final static int AUDIO_TYPE = 1;
     public final static int SURVEY_TYPE = 2;

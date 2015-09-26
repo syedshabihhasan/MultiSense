@@ -119,12 +119,8 @@ public class RecordAudioEMA extends Service {
             audioRecord.read(audioData, 0, MultiSenseConstants.BUFFER_SIZE_BYTES / 2);
             writeAudioFile.writeToFile(audioData);
         }
-        // in case some data is left in the buffer
-        status = audioRecord.read(audioData, 0, MultiSenseConstants.BUFFER_SIZE_BYTES/2);
-        if(-1 < status){
-            writeAudioFile.writeToFile(audioData);
-        }
         Log.d("MS:RecordService", "Exiting extractShortsFromBuffer");
     }
+
 
 }

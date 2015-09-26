@@ -6,7 +6,6 @@ import java.util.ArrayList;
  * @author Syed Shabih Hasan
  */
 public class ResponseStore {
-    //TODO connect with MultiSense
     private ArrayList<int[]> responses;
 
     public ResponseStore(){
