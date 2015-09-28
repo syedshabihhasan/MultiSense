@@ -3,8 +3,6 @@ package edu.uiowa.cs.multisense;
 import android.media.AudioFormat;
 import android.media.MediaRecorder;
 
-import java.util.HashMap;
-
 /**
  * Created by Syed Shabih Hasan on 9/22/15.
  */

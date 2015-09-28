@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import edu.uiowa.cs.multisense.sensors.RecordAudioEMA;
@@ -19,6 +20,11 @@ public class MultiSense extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_multi_sense);
+        if(getIntent().hasExtra("SurveyAlarm")){
+            Log.d("MS:", "Activity started by alarm");
+        }else{
+            Log.d("MS:", "Activity started by normal invocation");
+        }
         initVals();
         startService(intent);
         Toast.makeText(context, "Starting service", Toast.LENGTH_SHORT).show();
