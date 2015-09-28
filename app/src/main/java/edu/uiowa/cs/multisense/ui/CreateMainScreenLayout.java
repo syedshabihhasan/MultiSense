@@ -22,11 +22,13 @@ public class CreateMainScreenLayout {
     private Context context;
     private Activity multiSenseActivity;
     private CreateSurveyLayout createSurveyLayout;
+    private final CreateSettingsScreenLayout createSettingsScreenLayout;
 
     public CreateMainScreenLayout(Context ipContext){
         this.context = ipContext;
         this.multiSenseActivity = (Activity) this.context;
         this.createSurveyLayout = new CreateSurveyLayout(this.context);
+        this.createSettingsScreenLayout = new CreateSettingsScreenLayout(this.context, this);
     }
 
     public void constructMainScreen(){
@@ -51,13 +53,19 @@ public class CreateMainScreenLayout {
         vibrationMode = setGenericLogic(vibrationMode, this.context);
 
         Button internalSettings = createButton("Settings", 24, this.context);
+        internalSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createSettingsScreenLayout.constructSettingsLayout();
+            }
+        });
 //        internalSettings.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
 //                setAlarm();
 //            }
 //        });
-        internalSettings = setGenericLogic(internalSettings, this.context);
+//        internalSettings = setGenericLogic(internalSettings, this.context);
 
         Button exitButton = createFinish(this.context, this.multiSenseActivity);
 
