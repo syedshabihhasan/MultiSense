@@ -3,6 +3,8 @@ package edu.uiowa.cs.multisense;
 import android.media.AudioFormat;
 import android.media.MediaRecorder;
 
+import java.util.HashMap;
+
 /**
  * Created by Syed Shabih Hasan on 9/22/15.
  */
@@ -19,4 +21,24 @@ public class MultiSenseConstants {
     public final static String FILE_LOCATION = "/sdcard/MultiSense/";
 
     public static final int TIMER_COUNT = 1*60*1000;
+    public static final String[] MONTH_DICT = new String[]{
+            "JAN",
+            "FEB",
+            "MAR",
+            "APR",
+            "MAY",
+            "JUN",
+            "JUL",
+            "AUG",
+            "SEP",
+            "OCT",
+            "NOV",
+            "DEC"
+    };
+
+    public static final float EDITTEXT_FONTSIZE = 32;
+    public static final float TEXTVIEW_FONTSIZE = 32;
+    public static final float BUTTON_FONTSIZE = 32;
+
+    public static final String CONFIG_FILENAME = "multisenseConfig.cfg";
 }
