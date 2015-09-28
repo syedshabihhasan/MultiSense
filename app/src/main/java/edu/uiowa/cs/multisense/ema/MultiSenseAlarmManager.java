@@ -21,6 +21,7 @@ public class MultiSenseAlarmManager extends BroadcastReceiver {
         if(intent.getBooleanExtra("Activity", false)){
             intent = new Intent(context, MultiSense.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("SurveyAlarm", true);
             context.startActivity(intent);
         }
     }
