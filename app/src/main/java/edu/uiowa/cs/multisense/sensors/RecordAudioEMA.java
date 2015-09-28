@@ -44,9 +44,22 @@ public class RecordAudioEMA extends Service {
         }else{
             // if there is a user initiated survey, or if there is an intent,
             // cancel the current timer and reset to record for another pre-decided duration
-            stopServiceTimer.cancel();
-            stopServiceTimer.purge();
-            stopServiceTimer.schedule(stopServiceTimerTask, MultiSenseConstants.TIMER_COUNT);
+            if(stopServiceTimerTask.cancel()){
+                Log.d("MS:", "Service timer task cancelled");
+                stopServiceTimer.cancel();
+                stopServiceTimer.purge();
+
+                stopServiceTimerTask = null;
+                stopServiceTimer = null;
+
+                Log.d("MS:", "Service timer cancelled and purged");
+                stopServiceTimer = new Timer();
+                stopServiceTimerTask = scheduleTimerTask();
+                stopServiceTimer.schedule(stopServiceTimerTask, MultiSenseConstants.TIMER_COUNT);
+                Log.d("MS:", "New timer scheduled");
+            }else{
+                Log.d("MS:", "Could not cancel timer task");
+            }
         }
         Log.d("MS:RecordService", "Exiting onStartCommand()");
         return START_NOT_STICKY;
@@ -96,12 +109,7 @@ public class RecordAudioEMA extends Service {
             }
         }, "AudioRecordingThread");
 
-        stopServiceTimerTask = new TimerTask() {
-            @Override
-            public void run() {
-                onDestroy();
-            }
-        };
+        stopServiceTimerTask = scheduleTimerTask();
 
         stopServiceTimer = new Timer();
 
@@ -122,5 +130,13 @@ public class RecordAudioEMA extends Service {
         Log.d("MS:RecordService", "Exiting extractShortsFromBuffer");
     }
 
+    private TimerTask scheduleTimerTask(){
+        return new TimerTask() {
+            @Override
+            public void run() {
+                onDestroy();
+            }
+        };
+    }
 
 }
