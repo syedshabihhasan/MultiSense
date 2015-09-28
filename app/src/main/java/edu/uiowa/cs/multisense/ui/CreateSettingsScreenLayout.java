@@ -3,6 +3,7 @@ package edu.uiowa.cs.multisense.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +16,7 @@ import android.widget.TimePicker;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import edu.uiowa.cs.multisense.MultiSense;
 import edu.uiowa.cs.multisense.MultiSenseConstants;
 import edu.uiowa.cs.multisense.fileio.WriteConfigFile;
 
@@ -46,11 +48,23 @@ public class CreateSettingsScreenLayout {
 
         final EditText patientID = new EditText(context);
         patientID.setTextSize(MultiSenseConstants.EDITTEXT_FONTSIZE);
+        patientID.setInputType(InputType.TYPE_CLASS_NUMBER);
         patientID.setHint("Enter Subject ID");
 
         final EditText deviceID = new EditText(context);
         deviceID.setTextSize(MultiSenseConstants.EDITTEXT_FONTSIZE);
+        deviceID.setInputType(InputType.TYPE_CLASS_NUMBER);
         deviceID.setHint("Enter E4 device ID");
+
+        final EditText surveyGap = new EditText(context);
+        surveyGap.setTextSize(MultiSenseConstants.EDITTEXT_FONTSIZE);
+        surveyGap.setInputType(InputType.TYPE_CLASS_NUMBER);
+        surveyGap.setHint("Gap between surveys (minutes)");
+
+        final EditText randomPeriod = new EditText(context);
+        randomPeriod.setTextSize(MultiSenseConstants.EDITTEXT_FONTSIZE);
+        randomPeriod.setInputType(InputType.TYPE_CLASS_NUMBER);
+        randomPeriod.setHint("Enter random period (minutes)");
 
         Button nextButton = new Button(context);
         nextButton.setTextSize(MultiSenseConstants.BUTTON_FONTSIZE);
@@ -60,12 +74,17 @@ public class CreateSettingsScreenLayout {
             public void onClick(View v) {
                 writeConfigFile.pushConfig("Patient ID", patientID.getText().toString());
                 writeConfigFile.pushConfig("Device ID", deviceID.getText().toString());
+                writeConfigFile.pushConfig("Time Gap", surveyGap.getText().toString());
+                writeConfigFile.pushConfig("Random Gap", randomPeriod.getText().toString());
+
                 LinearLayout nextLayout = getStartEndDate(true);
                 multisense.setContentView(nextLayout);
             }
         });
         patientInfo.addView(patientID);
         patientInfo.addView(deviceID);
+        patientInfo.addView(surveyGap);
+        patientInfo.addView(randomPeriod);
         patientInfo.addView(nextButton);
         return patientInfo;
     }

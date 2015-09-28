@@ -6,13 +6,16 @@ import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.ServiceConfigurationError;
 
 import edu.uiowa.cs.multisense.ema.MoveQuestion;
 import edu.uiowa.cs.multisense.ema.ResponseStore;
@@ -58,7 +61,7 @@ public class CreateSurveyLayout {
      *                 answer texts
      * @return LinearLayout with the appropriate questions and answers
      * */
-    private LinearLayout createLayoutOnInput(String[] qAString){
+    private LinearLayout createLayoutOnInput(String[] qAString, int prevAns){
         LinearLayout linearLayout = new LinearLayout(context);
         pressedResponse = new boolean[qAString.length - 1];
         LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
@@ -77,6 +80,10 @@ public class CreateSurveyLayout {
         for(int i=0; i<n-1; i++){
             optionButton[i] = createButton(qAString[i + 1], 24, context);
             optionButton[i] = setSurveyButtonLogic(optionButton[i], optionButton, i);
+            if(-1 != prevAns && i == prevAns){
+                pressedResponse[i] = true;
+                optionButton[i].setBackgroundColor(Color.rgb(0, 128, 255));
+            }
             linearLayout.addView(optionButton[i]);
         }
 
@@ -164,19 +171,31 @@ public class CreateSurveyLayout {
                     if(-1 != resp){
                         responseStore.removeAndPush(qNo, resp);
                         int nextQ = moveQuestion.getNextQuestion(qNo+1, qDB, responseStore);
-                        createNextLayout(nextQ);
+                        createNextLayout(nextQ, -1);
                     }else{
                         Toast.makeText(context, "Please select an option",
                                 Toast.LENGTH_SHORT).show();
                     }
                 }
             });
+        }else{
+            actionButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int previousQuestion = responseStore.getPreviousQuestion(qNo);
+                    int previousResponse = responseStore.getResponse(previousQuestion);
+                    Log.d("MS:", "SurveyBack pressed, cQ:"+qNo+" pQ: "+previousQuestion +
+                            ", pR: "+ previousResponse);
+                    createNextLayout(previousQuestion, previousResponse);
+                }
+            });
         }
         return actionButton;
     }
 
-    protected void createNextLayout(int qNo){
+    protected void createNextLayout(int qNo, int prevAns){
         LinearLayout ll;
+        ScrollView scrollView;
         if(-1 == qNo){
             ArrayList<int[]> allResponses = this.responseStore.getAllResponses();
             int[] temp;
@@ -187,12 +206,21 @@ public class CreateSurveyLayout {
             ll = createFinalLayout();
             ll.addView(createFinish());
         }else{
-            ll = createLayoutOnInput(this.qDB.get(qNo));
+            ll = createLayoutOnInput(this.qDB.get(qNo), prevAns);
             Button nextButton = createActionButton(true, qNo);
             ll.addView(nextButton);
+            if(0 < qNo){
+                Button prevButton = createActionButton(false, qNo);
+                ll.addView(prevButton);
+            }
         }
         ll.setBackgroundColor(Color.rgb(153, 204, 255));
-        multiSense.setContentView(ll);
+        scrollView = new ScrollView(context);
+        scrollView.setLayoutParams(new ScrollView.LayoutParams(
+                ScrollView.LayoutParams.MATCH_PARENT, ScrollView.LayoutParams.MATCH_PARENT));
+        scrollView.setBackgroundColor(Color.rgb(153, 204, 255));
+        scrollView.addView(ll);
+        multiSense.setContentView(scrollView);
     }
 
     private Button createFinish(){
