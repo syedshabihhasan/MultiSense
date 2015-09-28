@@ -14,6 +14,7 @@ public class ReadConfigFile {
 
     private Context context;
     private String configData;
+
     public ReadConfigFile(Context ipContext){
         this.context = ipContext;
         this.configData = "";
