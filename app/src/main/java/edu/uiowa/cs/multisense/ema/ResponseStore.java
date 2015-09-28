@@ -93,16 +93,11 @@ public class ResponseStore {
      * current question (qNo) does not exist
      * */
     public int getPreviousQuestion(int qNo){
-        int idx;
-        if(-1 != (idx = searchQuestionNo(qNo))){
-            if(0 == idx){
-                return idx;
-            }else{
-                int[] temp = this.responses.get(idx - 1);
-                return temp[0];
-            }
+        if(0 == qNo){
+            return 0;
         }else{
-            return -1;
+            int temp[] = responses.get(responses.size()-1);
+            return temp[0];
         }
     }
 }
