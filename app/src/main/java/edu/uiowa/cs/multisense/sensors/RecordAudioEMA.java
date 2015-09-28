@@ -22,9 +22,9 @@ public class RecordAudioEMA extends Service {
     private static boolean isRecording = false;
     private AudioRecord audioRecord;
     private Thread extractFromBuffer;
-    private WriteAudioFile writeAudioFile;
     private static TimerTask stopServiceTimerTask;
     private static Timer stopServiceTimer;
+    private WriteAudioFile writeAudioFile;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -69,11 +69,13 @@ public class RecordAudioEMA extends Service {
     public void onDestroy(){
         Log.d("MS:RecordService", "Entering onDestroy()");
         isRecording = false;
+        // give the thread some time to shut down properly
+        for(int i = 0; i < 10000000; i++){}
+        writeAudioFile.doneWriting();
         audioRecord.stop();
         audioRecord.release();
         audioRecord = null;
         extractFromBuffer = null;
-        writeAudioFile.doneWriting();
         Log.d("MS:RecordService", "Exiting onDestroy()");
     }
 
@@ -122,7 +124,6 @@ public class RecordAudioEMA extends Service {
     private void extractShortsFromBuffer() {
         Log.d("MS:RecordService", "Entered extractShortsFromBuffer");
         short[] audioData = new short[MultiSenseConstants.BUFFER_SIZE_BYTES/2];
-        int status;
         while (isRecording){
             audioRecord.read(audioData, 0, MultiSenseConstants.BUFFER_SIZE_BYTES / 2);
             writeAudioFile.writeToFile(audioData);
@@ -138,5 +139,6 @@ public class RecordAudioEMA extends Service {
             }
         };
     }
+
 
 }
