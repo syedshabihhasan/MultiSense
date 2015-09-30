@@ -28,7 +28,7 @@ public class ReadConfigFile {
             while(-1 != (c = fileInputStream.read())){
                 this.configData += Character.toString((char) c);
             }
-
+            fileInputStream.close();
         }catch (Exception e){
             Log.e("MS:", "Something happened");
             e.printStackTrace();

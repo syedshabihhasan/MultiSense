@@ -26,6 +26,22 @@ public class WriteConfigFile {
     }
 
     public void pushConfig(String field, String configString){
+        if(field.equals("Start Time") || field.equals("End Time")){
+            String[] temp = configString.split("\\s");
+            if(1 == temp[1].length()){
+                temp[1] = "0"+temp[1];
+            }
+            if(1 == temp[0].length()){
+                temp[0] = "0"+temp[0];
+            }
+            configString = temp[0] + " " + temp[1];
+        }else if(field.equals("Start Date") || field.equals("End Date")){
+            String[] temp = configString.split("\\s");
+            if(1 == temp[0].length()){
+                temp[0] = "0"+temp[0];
+            }
+            configString = temp[0] + " " + temp[1] + " " + temp[2];
+        }
         this.configData += configString + "\n";
         this.configEntries.add(new String[]{field, configString});
         Log.d("MS:", "Pushed data, "+ field + ": "+ configString);
