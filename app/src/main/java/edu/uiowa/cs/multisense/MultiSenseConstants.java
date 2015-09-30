@@ -18,7 +18,7 @@ public class MultiSenseConstants {
 
     public final static String FILE_LOCATION = "/sdcard/MultiSense/";
 
-    public static final int TIMER_COUNT = 1*60*1000;
+    public static final int TIMER_COUNT = 2*60*1000;
     public static final String[] MONTH_DICT = new String[]{
             "JAN",
             "FEB",
