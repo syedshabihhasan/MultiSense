@@ -18,6 +18,7 @@ import java.util.Calendar;
 
 import edu.uiowa.cs.multisense.MultiSense;
 import edu.uiowa.cs.multisense.MultiSenseConstants;
+import edu.uiowa.cs.multisense.ema.SetMultiSenseAlarms;
 import edu.uiowa.cs.multisense.fileio.WriteConfigFile;
 
 /**
@@ -28,6 +29,7 @@ public class CreateSettingsScreenLayout {
     private final Activity multisense;
     private final WriteConfigFile writeConfigFile;
     private final CreateMainScreenLayout createMainScreenLayout;
+    private final SetMultiSenseAlarms setMultiSenseAlarms;
 
     public CreateSettingsScreenLayout(Context ipContext,
                                       CreateMainScreenLayout cMSL){
@@ -35,6 +37,7 @@ public class CreateSettingsScreenLayout {
         multisense = (Activity) this.context;
         writeConfigFile = new WriteConfigFile(this.context);
         createMainScreenLayout = cMSL;
+        setMultiSenseAlarms = new SetMultiSenseAlarms(this.context);
     }
 
     protected void constructSettingsLayout(){
@@ -212,6 +215,8 @@ public class CreateSettingsScreenLayout {
             public void onClick(View v) {
                 boolean success = writeConfigFile.saveConfig();
                 if(success) {
+                    int surveyRand = setMultiSenseAlarms.getNextSurveyTime(true);
+                    setMultiSenseAlarms.setAlarm(surveyRand*60*1000 , true);
                     Log.d("MS:", "saved config");
                 } else{
                     Log.d("MS:", "not saved config");

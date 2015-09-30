@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import edu.uiowa.cs.multisense.MultiSense;
 import edu.uiowa.cs.multisense.ema.MultiSenseAlarmManager;
 
 /**
@@ -47,9 +46,11 @@ public class CreateMainScreenLayout {
         * */
 
         Button snoozeSurvey = createButton("Snooze", 24, this.context);
+        //TODO: implement snooze capability
         snoozeSurvey = setGenericLogic(snoozeSurvey, this.context);
 
         Button vibrationMode = createButton("Ring/Vibrate", 24, this.context);
+        //TODO implement vibration facility
         vibrationMode = setGenericLogic(vibrationMode, this.context);
 
         Button internalSettings = createButton("Settings", 24, this.context);
@@ -59,13 +60,6 @@ public class CreateMainScreenLayout {
                 createSettingsScreenLayout.constructSettingsLayout();
             }
         });
-//        internalSettings.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                setAlarm();
-//            }
-//        });
-//        internalSettings = setGenericLogic(internalSettings, this.context);
 
         Button exitButton = createFinish(this.context, this.multiSenseActivity);
 
@@ -121,22 +115,11 @@ public class CreateMainScreenLayout {
         ipButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createSurveyLayout.createNextLayout(0);
+                createSurveyLayout.createNextLayout(0, -1);
             }
         });
         return ipButton;
     }
 
-//    private void setAlarm(){
-//        Intent intent = new Intent(this.context, MultiSenseAlarmManager.class);
-//        intent.putExtra("Activity", true);
-//        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-//                this.multiSenseActivity.getApplicationContext(), 0, intent, 0);
-//        AlarmManager alarmManager = (AlarmManager) this.context.getSystemService(
-//                                        Context.ALARM_SERVICE);
-//        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (60 * 1000),
-//                pendingIntent);
-//        Toast.makeText(this.context, "Alarm set for 1 minute", Toast.LENGTH_SHORT).show();
-//    }
 
 }

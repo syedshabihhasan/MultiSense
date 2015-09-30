@@ -23,13 +23,10 @@ import edu.uiowa.cs.multisense.fileio.ReadFromFile;
 
 
 /**
- *
+ * @author hasanshabih
  */
 public class CreateSurveyLayout {
 
-    /*
-    * TODO: the response store, logicMap, questions DB etc all have to initialized here
-    * */
     private static Context context;
     private boolean[] pressedResponse;
     private static Activity multiSense;
@@ -231,6 +228,7 @@ public class CreateSurveyLayout {
         finishButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //TODO: save survey file, use config file for filename
                 multiSense.finish();
             }
         });
