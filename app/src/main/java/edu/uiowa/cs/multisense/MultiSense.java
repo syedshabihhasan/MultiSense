@@ -20,10 +20,15 @@ public class MultiSense extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_multi_sense);
-        if(getIntent().hasExtra("SurveyAlarm")){
+        if(getIntent().getAction().equals("SurveyAlarm")){
             Log.d("MS:", "Activity started by alarm");
         }else{
             Log.d("MS:", "Activity started by normal invocation");
+            //TODO: user cannot take survey on their own, implement something to take care of this
+            if(RecordAudioEMA.serviceRunning){
+                Toast.makeText(this, "Cannot open app", Toast.LENGTH_SHORT).show();
+                finish();
+            }
         }
         initVals();
         startService(intent);
@@ -36,6 +41,4 @@ public class MultiSense extends AppCompatActivity {
         createMainScreenLayout = new CreateMainScreenLayout(context);
         intent = new Intent(this, RecordAudioEMA.class);
     }
-
-
 }
