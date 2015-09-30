@@ -19,7 +19,9 @@ import edu.uiowa.cs.multisense.fileio.WriteAudioFile;
  * */
 public class RecordAudioEMA extends Service {
 
+    //TODO: file name to be used has to taken from config file
     private static boolean isRecording = false;
+    public static boolean serviceRunning = false;
     private AudioRecord audioRecord;
     private Thread extractFromBuffer;
     private static TimerTask stopServiceTimerTask;
@@ -38,12 +40,12 @@ public class RecordAudioEMA extends Service {
             Log.d("MS:RecordService", "Not recording, going to record");
             initVals();
             isRecording = true;
+            serviceRunning = true;
             audioRecord.startRecording();
             extractFromBuffer.start();
             stopServiceTimer.schedule(stopServiceTimerTask, MultiSenseConstants.TIMER_COUNT);
         }else{
-            // if there is a user initiated survey, or if there is an intent,
-            // cancel the current timer and reset to record for another pre-decided duration
+            // TODO: since we are only dealing with app init, this can be removed
             if(stopServiceTimerTask.cancel()){
                 Log.d("MS:", "Service timer task cancelled");
                 stopServiceTimer.cancel();
@@ -56,6 +58,8 @@ public class RecordAudioEMA extends Service {
                 stopServiceTimer = new Timer();
                 stopServiceTimerTask = scheduleTimerTask();
                 stopServiceTimer.schedule(stopServiceTimerTask, MultiSenseConstants.TIMER_COUNT);
+
+                serviceRunning = true;
                 Log.d("MS:", "New timer scheduled");
             }else{
                 Log.d("MS:", "Could not cancel timer task");
@@ -72,6 +76,7 @@ public class RecordAudioEMA extends Service {
         // give the thread some time to shut down properly
         for(int i = 0; i < 10000000; i++){}
         writeAudioFile.doneWriting();
+        serviceRunning = false;
         audioRecord.stop();
         audioRecord.release();
         audioRecord = null;
