@@ -1,10 +1,13 @@
 package edu.uiowa.cs.multisense.ema;
 
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import edu.uiowa.cs.multisense.MultiSense;
+import edu.uiowa.cs.multisense.sensors.RecordAudioEMA;
 
 /**
  * Created by Syed Shabih Hasan on 9/25/15.
@@ -18,19 +21,42 @@ public class MultiSenseAlarmManager extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(intent.getBooleanExtra("Activity", false)){
-            intent = new Intent(context, MultiSense.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra("SurveyAlarm", true);
-            context.startActivity(intent);
+        Log.d("MS:", "Broadcast received");
+        SetMultiSenseAlarms setMultiSenseAlarms;
+        CheckAlarmConditions checkAlarmConditions = new CheckAlarmConditions(context);
+        int res = checkAlarmConditions.IsAlarmLegal(System.currentTimeMillis());
+        Log.d("MS:", "Alarm conditions check: "+res);
+        setMultiSenseAlarms = new SetMultiSenseAlarms(context);
+        if(1 == res){
+            if(intent.getAction().equals("StartActivity")){
+                Log.d("MS:", "Has StartActivity extra");
+
+                intent = new Intent(context, MultiSense.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setAction("SurveyAlarm");
+
+                //before starting survey, set the alarm for the next audio
+                int surveyRand = setMultiSenseAlarms.getNextSurveyTime(true);
+                setMultiSenseAlarms.setAlarm(surveyRand*60*1000, true);
+
+                context.startActivity(intent);
+            }
+            else if(intent.getAction().equals("StartAudio")){
+                Log.d("MS:", "Has StartAudio extra");
+                //before starting the audio recording, set the alarm for the survey
+                //TODO: do something here about the 1
+                setMultiSenseAlarms.setAlarm(1*60*1000, false);
+                intent = new Intent(context, RecordAudioEMA.class);
+
+                context.startService(intent);
+            }
+        }else if(0 == res){
+            int surveyRand = setMultiSenseAlarms.getNextSurveyTime(true);
+            setMultiSenseAlarms.setAlarm(surveyRand*60*1000, true);
+
+        }else{
+            Log.d("MS:", "No more alarms, bye!");
+            // the end date and time have passed, do nothing
         }
-    }
-
-    public void setAudioAlarm(){
-
-    }
-
-    public void setSurveyAlarm(){
-
     }
 }
