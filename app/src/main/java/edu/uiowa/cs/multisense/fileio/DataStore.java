@@ -2,7 +2,6 @@ package edu.uiowa.cs.multisense.fileio;
 
 import android.util.Log;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;

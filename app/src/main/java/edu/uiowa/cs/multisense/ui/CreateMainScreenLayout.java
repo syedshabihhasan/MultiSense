@@ -6,25 +6,20 @@ import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Vibrator;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import edu.uiowa.cs.multisense.MultiSense;
 import edu.uiowa.cs.multisense.MultiSenseConstants;
 import edu.uiowa.cs.multisense.fileio.ReadConfigFile;
-import edu.uiowa.cs.multisense.fileio.ReadWriteInternals;
 import edu.uiowa.cs.multisense.sensors.RecordAudioEMA;
 
 /**

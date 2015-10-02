@@ -17,7 +17,6 @@ import android.widget.TimePicker;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import edu.uiowa.cs.multisense.MultiSense;
 import edu.uiowa.cs.multisense.MultiSenseConstants;
 import edu.uiowa.cs.multisense.ema.SetMultiSenseAlarms;
 import edu.uiowa.cs.multisense.fileio.WriteConfigFile;
