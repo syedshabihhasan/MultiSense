@@ -3,6 +3,7 @@ package edu.uiowa.cs.multisense.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,9 +17,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.ServiceConfigurationError;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import edu.uiowa.cs.multisense.MultiSenseConstants;
 import edu.uiowa.cs.multisense.ema.MoveQuestion;
 import edu.uiowa.cs.multisense.ema.ResponseStore;
+import edu.uiowa.cs.multisense.fileio.DataStore;
+import edu.uiowa.cs.multisense.fileio.ReadConfigFile;
 import edu.uiowa.cs.multisense.fileio.ReadFromFile;
 
 
@@ -26,6 +32,7 @@ import edu.uiowa.cs.multisense.fileio.ReadFromFile;
  * @author hasanshabih
  */
 public class CreateSurveyLayout {
+    //TODO: survey timeout
 
     private static Context context;
     private boolean[] pressedResponse;
@@ -35,11 +42,21 @@ public class CreateSurveyLayout {
     private ReadFromFile readFromFile;
     private ArrayList<String[]> qDB;
     private MoveQuestion moveQuestion;
+    private final String currentDateTime;
+    private DataStore dataStore;
 
-    public CreateSurveyLayout(Context ipContext){
+    private Timer surveyTimeoutTimer;
+    private TimerTask surveyTimeoutTimerTask;
+
+    private static boolean firstCallToSurveyDone = false;
+
+    private Vibrator vibrator;
+
+    public CreateSurveyLayout(Context ipContext, String currentDateTime){
         context = ipContext;
         multiSense = (Activity) context;
 
+        this.currentDateTime = currentDateTime;
         // get the survey and the conditional structure
         this.readFromFile = new ReadFromFile(context);
         this.qDB = readFromFile.getQuestions();
@@ -50,6 +67,8 @@ public class CreateSurveyLayout {
 
         // initialize the response store
         responseStore = new ResponseStore();
+
+        this.vibrator = (Vibrator) this.context.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     /**
@@ -128,6 +147,7 @@ public class CreateSurveyLayout {
         buttonToUse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                vibrator.vibrate(MultiSenseConstants.BUTTON_VIBRATE_DURATION);
                 Arrays.fill(pressedResponse, false);
                 pressedResponse[idx] = true;
                 buttonToUse.setBackgroundColor(Color.rgb(0, 128, 255));
@@ -157,13 +177,15 @@ public class CreateSurveyLayout {
         actionButton.setTextSize(32);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(20,20,20,20);
+        params.setMargins(20, 20, 20, 20);
+        params.weight = 1;
         actionButton.setLayoutParams(params);
         actionButton.setText(isNext ? "Next" : "Back");
         if(isNext){
             actionButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    vibrator.vibrate(MultiSenseConstants.BUTTON_VIBRATE_DURATION);
                     int resp = getFinalResponse();
                     if(-1 != resp){
                         responseStore.removeAndPush(qNo, resp);
@@ -179,6 +201,7 @@ public class CreateSurveyLayout {
             actionButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    vibrator.vibrate(MultiSenseConstants.BUTTON_VIBRATE_DURATION);
                     int previousQuestion = responseStore.getPreviousQuestion(qNo);
                     int previousResponse = responseStore.getResponse(previousQuestion);
                     Log.d("MS:", "SurveyBack pressed, cQ:"+qNo+" pQ: "+previousQuestion +
@@ -191,6 +214,22 @@ public class CreateSurveyLayout {
     }
 
     protected void createNextLayout(int qNo, int prevAns){
+        if(! firstCallToSurveyDone){
+            Log.d("MS:", "First call to survey, setting timeout");
+            firstCallToSurveyDone = true;
+
+            surveyTimeoutTimerTask = scheduleSurveyTimeout();
+            surveyTimeoutTimer = new Timer();
+
+            ReadConfigFile readConfigFile = new ReadConfigFile(context);
+            String[] allResponses = readConfigFile.readConfigData().split("\\n");
+
+            surveyTimeoutTimer.schedule(surveyTimeoutTimerTask,
+                    Integer.parseInt(allResponses[MultiSenseConstants.SURVEY_TIMEOUT])*60*1000);
+
+            Log.d("MS:", "timeout set for "+
+                    Integer.parseInt(allResponses[MultiSenseConstants.SURVEY_TIMEOUT]) + "mins");
+        }
         LinearLayout ll;
         ScrollView scrollView;
         if(-1 == qNo){
@@ -205,11 +244,11 @@ public class CreateSurveyLayout {
         }else{
             ll = createLayoutOnInput(this.qDB.get(qNo), prevAns);
             Button nextButton = createActionButton(true, qNo);
-            ll.addView(nextButton);
             if(0 < qNo){
                 Button prevButton = createActionButton(false, qNo);
                 ll.addView(prevButton);
             }
+            ll.addView(nextButton);
         }
         ll.setBackgroundColor(Color.rgb(153, 204, 255));
         scrollView = new ScrollView(context);
@@ -228,10 +267,34 @@ public class CreateSurveyLayout {
         finishButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                vibrator.vibrate(MultiSenseConstants.BUTTON_VIBRATE_DURATION);
+                Log.d("MS:", "finish survey, cancel timer");
+                surveyTimeoutTimer.cancel();
+                surveyTimeoutTimer.purge();
+                surveyTimeoutTimerTask = null;
+                surveyTimeoutTimer = null;
+                firstCallToSurveyDone = false;
+                Log.d("MS:", "timer cancelled");
                 //TODO: save survey file, use config file for filename
+                // TODO: add back button
+                dataStore = new DataStore(responseStore.getAllResponses(), currentDateTime);
+                dataStore.WriteSurveyToFile(false);
                 multiSense.finish();
             }
         });
         return finishButton;
+    }
+
+    private TimerTask scheduleSurveyTimeout(){
+        return new TimerTask() {
+            @Override
+            public void run() {
+                dataStore = new DataStore(responseStore.getAllResponses(), currentDateTime);
+                dataStore.WriteSurveyToFile(true);
+                firstCallToSurveyDone = false;
+//                Toast.makeText(context, "Survey timed out", Toast.LENGTH_LONG).show();
+                multiSense.finish();
+            }
+        };
     }
 }

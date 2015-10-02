@@ -3,6 +3,7 @@ package edu.uiowa.cs.multisense.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
+import android.os.Vibrator;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -31,6 +32,8 @@ public class CreateSettingsScreenLayout {
     private final CreateMainScreenLayout createMainScreenLayout;
     private final SetMultiSenseAlarms setMultiSenseAlarms;
 
+    private Vibrator vibrator;
+
     public CreateSettingsScreenLayout(Context ipContext,
                                       CreateMainScreenLayout cMSL){
         this.context = ipContext;
@@ -38,6 +41,7 @@ public class CreateSettingsScreenLayout {
         writeConfigFile = new WriteConfigFile(this.context);
         createMainScreenLayout = cMSL;
         setMultiSenseAlarms = new SetMultiSenseAlarms(this.context);
+        vibrator = (Vibrator) this.context.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     protected void constructSettingsLayout(){
@@ -69,17 +73,31 @@ public class CreateSettingsScreenLayout {
         randomPeriod.setInputType(InputType.TYPE_CLASS_NUMBER);
         randomPeriod.setHint("Enter random period (minutes)");
 
+        final EditText surveyTimeout = new EditText(context);
+        surveyTimeout.setTextSize(MultiSenseConstants.EDITTEXT_FONTSIZE);
+        surveyTimeout.setInputType(InputType.TYPE_CLASS_NUMBER);
+        surveyTimeout.setHint("Survey timeout (minutes)");
+
+        final EditText mainScreenTimeout = new EditText(context);
+        mainScreenTimeout.setTextSize(MultiSenseConstants.EDITTEXT_FONTSIZE);
+        mainScreenTimeout.setInputType(InputType.TYPE_CLASS_NUMBER);
+        mainScreenTimeout.setHint("Main screen timeout (minutes)");
+
         Button nextButton = new Button(context);
         nextButton.setTextSize(MultiSenseConstants.BUTTON_FONTSIZE);
         nextButton.setText("Next");
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //TODO: do not go forward until all entries are present
+                vibrator.vibrate(MultiSenseConstants.BUTTON_VIBRATE_DURATION);
                 writeConfigFile.pushConfig("Patient ID", patientID.getText().toString());
                 writeConfigFile.pushConfig("Device ID", deviceID.getText().toString());
                 writeConfigFile.pushConfig("Time Gap", surveyGap.getText().toString());
                 writeConfigFile.pushConfig("Random Gap", randomPeriod.getText().toString());
-
+                writeConfigFile.pushConfig("Timeout", surveyTimeout.getText().toString());
+                writeConfigFile.pushConfig("Mainscreen Timeout",
+                        mainScreenTimeout.getText().toString());
                 LinearLayout nextLayout = getStartEndDate(true);
                 multisense.setContentView(nextLayout);
             }
@@ -88,6 +106,8 @@ public class CreateSettingsScreenLayout {
         patientInfo.addView(deviceID);
         patientInfo.addView(surveyGap);
         patientInfo.addView(randomPeriod);
+        patientInfo.addView(surveyTimeout);
+        patientInfo.addView(mainScreenTimeout);
         patientInfo.addView(nextButton);
         return patientInfo;
     }
@@ -119,6 +139,7 @@ public class CreateSettingsScreenLayout {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                vibrator.vibrate(MultiSenseConstants.BUTTON_VIBRATE_DURATION);
                 String dateSelected = "" + datePicker.getDayOfMonth() + " " +
                         MultiSenseConstants.MONTH_DICT[datePicker.getMonth()] + " " +
                         datePicker.getYear();
@@ -169,6 +190,7 @@ public class CreateSettingsScreenLayout {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                vibrator.vibrate(MultiSenseConstants.BUTTON_VIBRATE_DURATION);
                 String timeSelected;
                 if (Build.VERSION_CODES.M > Build.VERSION.SDK_INT) {
                     timeSelected = "" + timePicker.getCurrentHour() +
@@ -213,15 +235,16 @@ public class CreateSettingsScreenLayout {
         saveSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                vibrator.vibrate(MultiSenseConstants.BUTTON_VIBRATE_DURATION);
                 boolean success = writeConfigFile.saveConfig();
                 if(success) {
                     int surveyRand = setMultiSenseAlarms.getNextSurveyTime(true);
-                    setMultiSenseAlarms.setAlarm(surveyRand*60*1000 , true);
+                    setMultiSenseAlarms.setAlarm(surveyRand*60*1000 , true, "");
                     Log.d("MS:", "saved config");
                 } else{
                     Log.d("MS:", "not saved config");
                 }
-                createMainScreenLayout.constructMainScreen();
+                createMainScreenLayout.constructMainScreen(false);
             }
         });
 
@@ -231,6 +254,7 @@ public class CreateSettingsScreenLayout {
         redoSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                vibrator.vibrate(MultiSenseConstants.BUTTON_VIBRATE_DURATION);
                 writeConfigFile.clearCurrentConfig();
                 constructSettingsLayout();
             }
