@@ -6,7 +6,6 @@ import android.media.AudioRecord;
 import android.os.IBinder;
 import android.util.Log;
 
-import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,6 +26,7 @@ public class RecordAudioEMA extends Service {
     private static TimerTask stopServiceTimerTask;
     private static Timer stopServiceTimer;
     private WriteAudioFile writeAudioFile;
+    private String currentDateTime;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -38,6 +38,7 @@ public class RecordAudioEMA extends Service {
         Log.d("MS:RecordService", "Entering onStartCommand()");
         if(!isRecording){
             Log.d("MS:RecordService", "Not recording, going to record");
+            currentDateTime = intent.getStringExtra("CurrentDT");
             initVals();
             isRecording = true;
             serviceRunning = true;
@@ -46,24 +47,24 @@ public class RecordAudioEMA extends Service {
             stopServiceTimer.schedule(stopServiceTimerTask, MultiSenseConstants.TIMER_COUNT);
         }else{
             // TODO: since we are only dealing with app init, this can be removed
-            if(stopServiceTimerTask.cancel()){
-                Log.d("MS:", "Service timer task cancelled");
-                stopServiceTimer.cancel();
-                stopServiceTimer.purge();
-
-                stopServiceTimerTask = null;
-                stopServiceTimer = null;
-
-                Log.d("MS:", "Service timer cancelled and purged");
-                stopServiceTimer = new Timer();
-                stopServiceTimerTask = scheduleTimerTask();
-                stopServiceTimer.schedule(stopServiceTimerTask, MultiSenseConstants.TIMER_COUNT);
-
-                serviceRunning = true;
-                Log.d("MS:", "New timer scheduled");
-            }else{
-                Log.d("MS:", "Could not cancel timer task");
-            }
+//            if(stopServiceTimerTask.cancel()){
+//                Log.d("MS:", "Service timer task cancelled");
+//                stopServiceTimer.cancel();
+//                stopServiceTimer.purge();
+//
+//                stopServiceTimerTask = null;
+//                stopServiceTimer = null;
+//
+//                Log.d("MS:", "Service timer cancelled and purged");
+//                stopServiceTimer = new Timer();
+//                stopServiceTimerTask = scheduleTimerTask();
+//                stopServiceTimer.schedule(stopServiceTimerTask, MultiSenseConstants.TIMER_COUNT);
+//
+//                serviceRunning = true;
+//                Log.d("MS:", "New timer scheduled");
+//            }else{
+//                Log.d("MS:", "Could not cancel timer task");
+//            }
         }
         Log.d("MS:RecordService", "Exiting onStartCommand()");
         return START_NOT_STICKY;
@@ -89,17 +90,6 @@ public class RecordAudioEMA extends Service {
      * */
     private void initVals(){
         Log.d("MS:RecordService", "Entering initVals()");
-        Calendar calendar = Calendar.getInstance();
-
-        String currentDateTime = ""+
-                calendar.get(Calendar.YEAR)+"_"+
-                (calendar.get(Calendar.MONTH)+1)+"_"+
-                calendar.get(Calendar.DAY_OF_MONTH)+"_"+
-                calendar.get(Calendar.HOUR_OF_DAY)+"_"+
-                calendar.get(Calendar.MINUTE)+"_"+
-                calendar.get(Calendar.SECOND)+"_"+
-                calendar.get(Calendar.MILLISECOND);
-
         writeAudioFile = new WriteAudioFile(currentDateTime);
 
         audioRecord = new AudioRecord(MultiSenseConstants.RECORDER_SOURCE,
