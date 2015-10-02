@@ -30,10 +30,10 @@ public class CheckAlarmConditions {
 
     public int IsAlarmLegal(long currentTime){
         String[] indvInfo = getIndivInfo(readConfigFile.readConfigData());
-        String[] startDate = indvInfo[4].split("\\s");
-        String[] endDate = indvInfo[5].split("\\s");
-        String[] startTime = indvInfo[6].split("\\s");
-        String[] endTime = indvInfo[7].split("\\s");
+        String[] startDate = indvInfo[MultiSenseConstants.START_DATE].split("\\s");
+        String[] endDate = indvInfo[MultiSenseConstants.END_DATE].split("\\s");
+        String[] startTime = indvInfo[MultiSenseConstants.START_TIME].split("\\s");
+        String[] endTime = indvInfo[MultiSenseConstants.END_TIME].split("\\s");
         // check if currentTime is before the end date and end time
         if(beforeDateEndTime(currentTime, endDate, endTime)){
             Log.d("MS:", "currentTime  < End D & T");
