@@ -5,10 +5,12 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import java.util.Random;
 
+import edu.uiowa.cs.multisense.MultiSenseConstants;
 import edu.uiowa.cs.multisense.fileio.ReadConfigFile;
 
 /**
@@ -23,7 +25,7 @@ public class SetMultiSenseAlarms {
     }
 
 
-    public void setAlarm(long toStart, boolean isAudio){
+    public void setAlarm(long toStart, boolean isAudio, String currentDateTime){
         Intent intent;
         PendingIntent pendingIntent;
         AlarmManager alarmManager;
@@ -33,7 +35,9 @@ public class SetMultiSenseAlarms {
             intent.setAction("StartAudio");
         }else{
             intent.setAction("StartActivity");
+            intent.putExtra("CurrentDT", currentDateTime);
         }
+
         pendingIntent = PendingIntent.getBroadcast(this.context, 0, intent, 0);
         alarmManager = (AlarmManager) this.context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + toStart,
@@ -50,10 +54,12 @@ public class SetMultiSenseAlarms {
         ReadConfigFile readConfigFile = new ReadConfigFile(this.context);
         String[] allConfig = readConfigFile.readConfigData().split("\\n");
 
-        int duration = Integer.parseInt(allConfig[2]);
-        int randInterval = Integer.parseInt(allConfig[3]);
+        int duration = Integer.parseInt(allConfig[MultiSenseConstants.SURVEY_INTERVAL]);
+        int randInterval = Integer.parseInt(allConfig[MultiSenseConstants.RANDOM_INTERVAL]);
         Random randomIntGenerator = new Random((System.currentTimeMillis()%10)+1);
-        randInterval = randomIntGenerator.nextInt(randInterval);
+        if(0 != randInterval){
+            randInterval = randomIntGenerator.nextInt(randInterval);
+        }
         int surveyStartPoint = duration + randInterval;
 
         if(forAudio){
