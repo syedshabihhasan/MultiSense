@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import java.util.Calendar;
 
+import edu.uiowa.cs.multisense.power.CPULock;
 import edu.uiowa.cs.multisense.sensors.RecordAudioEMA;
 import edu.uiowa.cs.multisense.ui.CreateMainScreenLayout;
 
@@ -20,12 +22,14 @@ public class MultiSense extends AppCompatActivity {
     private String currentTimeDate = null;
 
     //TODO: power locks
-    //TODO: timers for when the alarm goes off
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_multi_sense);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         boolean isAlarm;
         if(getIntent().getAction().equals("SurveyAlarm")){
             Log.d("MS:", "Activity started by alarm");
@@ -38,11 +42,21 @@ public class MultiSense extends AppCompatActivity {
             if(RecordAudioEMA.serviceRunning){
                 Toast.makeText(this, "Cannot open app", Toast.LENGTH_SHORT).show();
                 finish();
+            }else{
+                Log.d("MS:", "No ongoing recording");
+                if(CPULock.lockAcquisitionStatus()){
+                    Log.d("MS:", "CPU lock is still acquired, releasing lock");
+                    int lockReleased = CPULock.releaseLock(CPULock.getLockAcquirer());
+                    if(MultiSenseConstants.LOCK_NULL == lockReleased
+                            || MultiSenseConstants.LOCK_RELEASED == lockReleased){
+                        Log.d("MS:", "CPU lock released");
+                    }else{
+                        Log.d("MS:", "CPU lock acquired by someone else, not released");
+                    }
+                }
             }
         }
         initVals();
-//        startService(intent);
-//        Toast.makeText(context, "Starting service", Toast.LENGTH_SHORT).show();
         createMainScreenLayout.constructMainScreen(isAlarm);
     }
 
