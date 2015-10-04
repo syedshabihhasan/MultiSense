@@ -54,5 +54,9 @@ public class MultiSenseConstants {
     public static final int START_TIME = 8;
     public static final int END_TIME = 9;
 
-    public static final long BUTTON_VIBRATE_DURATION = 500;
+    public static final long BUTTON_VIBRATE_DURATION = 300;
+
+    public static final int LOCK_ACQUIRED_BY_SOMEONE_ELSE = 0;
+    public static final int LOCK_RELEASED = 1;
+    public static final int LOCK_NULL = -1;
 }
